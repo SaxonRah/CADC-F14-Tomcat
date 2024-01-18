@@ -6,6 +6,8 @@ i doubt this will go anywhere, or even compile if i get that far.
 this is an extremely difficult project with tons of liberties taken from a lack of information/documentation.
 reverse engineering the die photos will be the most accurate path instead of relying on the reports/manuals information.
 
+![alt text](https://github.com/SaxonRah/CADC-F14-Tomcat/blob/main/fig_outline.png?raw=true)
+
 # refs
 ## firstmicroprocessor Info and Powerpoint on F-14
   https://firstmicroprocessor.com/wp-content/uploads/2020/02/2013powerpoint.ppt
