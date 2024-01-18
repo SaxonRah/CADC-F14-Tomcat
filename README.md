@@ -7,6 +7,8 @@ this is an extremely difficult project with tons of liberties taken from a lack 
 reverse engineering the die photos will be the most accurate path instead of relying on the reports/manuals information.
 
 # refs
+## firstmicroprocessor Info and Powerpoint on F-14
+  https://firstmicroprocessor.com/wp-content/uploads/2020/02/2013powerpoint.ppt
   https://web.archive.org/web/20240118055150/https://firstmicroprocessor.com/?doing_wp_cron=1705556352.5010390281677246093750
 ## Ken Sherriff Reverse-engineering the mechanical Bendix Central Air Data Computer
   https://www.righto.com/2023/10/bendix-cadc-reverse-engineering.html
@@ -16,3 +18,5 @@ reverse engineering the die photos will be the most accurate path instead of rel
   https://apps.dtic.mil/sti/tr/pdf/ADA047858.pdf
 ## NATOPS FLIGHT MANUAL NAVY MODEL F−14D AIRCRAFT
   https://info.publicintelligence.net/F14AAD-1.pdf
+## NASA Advanced Flight Control System Study Final Report 
+  https://core.ac.uk/download/pdf/42853936.pdf
