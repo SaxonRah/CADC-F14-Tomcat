@@ -1,7 +1,7 @@
 module CATC (
     input wire clk,          // Clock signal
     input wire rst,          // Reset signal
-    input wire [19:0] addr,  // Address bus (20 bits)
+    input wire [19:0] instr, // Instruction bus (20 bits)
     input wire [19:0] data_in, // Input data bus (20 bits)
     output reg [19:0] data_out // Output data bus (20 bits)
 );
@@ -10,51 +10,43 @@ module CATC (
 reg [19:0] memory [0:127];
 
 // Register definition
-reg [19:0] regA;
-reg [19:0] regB;
-reg [19:0] result;
+reg [19:0] registers [0:15];
 
 // Control signals
-reg [2:0] opcode;
+reg [3:0] opcode;
+reg [3:0] src_reg;
+reg [3:0] dest_reg;
+reg [9:0] immediate;
 
 always @(posedge clk or posedge rst) begin
     if (rst) begin
         // Reset values
-        regA <= 20'b0;
-        regB <= 20'b0;
-        result <= 20'b0;
+        opcode <= 4'b0000;
+        src_reg <= 4'b0000;
+        dest_reg <= 4'b0000;
+        immediate <= 10'b0000000000;
         data_out <= 20'b0;
+        registers <= 16 * 20'b0;
         memory <= 128 * 20'b0;
     end else begin
-        // Memory read operation
-        data_out <= memory[addr];
+        // Instruction decoding
+        opcode <= instr[19:16];
+        src_reg <= instr[15:12];
+        dest_reg <= instr[11:8];
+        immediate <= instr[7:0];
 
-        // ALU operations based on opcode
+        // Execute instruction based on opcode
         case (opcode)
-            3'b000: result <= regA + regB; // ADD
-            3'b001: result <= regA - regB; // SUB
-            3'b010: result <= regA & regB; // AND
-            3'b011: result <= regA | regB; // OR
-            // Add more operations as needed
-            default: result <= 20'b0; // Default case
-        endcase
-    end
-end
-
-always @(posedge clk or posedge rst) begin
-    if (rst) begin
-        // Reset values
-        opcode <= 3'b000;
-    end else begin
-        // Instruction decoding based on address
-        // Example: Assuming address 0 to 3 are reserved for instructions
-        case (addr)
-            4'h0: opcode <= data_in[2:0]; // Opcode is in the first 3 bits of the instruction
-            4'h1: regA <= data_in;
-            4'h2: regB <= data_in;
-            4'h3: memory[addr[7:0]] <= data_in; // Store instruction result in memory
-            // Add more cases as needed
-            default: opcode <= 3'b000; // Default case
+            4'b0000: data_out <= registers[src_reg]; // LOAD
+            4'b0001: registers[dest_reg] <= data_in; // STORE
+            4'b0010: data_out <= data_in + immediate; // ADDI
+            4'b0011: data_out <= data_in - immediate; // SUBI
+            4'b0100: data_out <= registers[src_reg] & registers[dest_reg]; // AND
+            4'b0101: data_out <= registers[src_reg] | registers[dest_reg]; // OR
+            4'b0110: data_out <= registers[src_reg] ^ registers[dest_reg]; // XOR
+            4'b0111: data_out <= ~data_in; // NOT
+            // Add more operations
+            default: data_out <= 20'b0; // Default case
         endcase
     end
 end
