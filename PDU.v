@@ -1,4 +1,4 @@
-module ParallelDivider (
+module PDU (
   input wire [19:0] dividend,
   input wire [19:0] divisor,
   output reg [19:0] quotient,
