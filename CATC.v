@@ -1,4 +1,4 @@
-module SimpleMicroprocessor (
+module CATC (
     input wire clk,          // Clock signal
     input wire rst,          // Reset signal
     input wire [19:0] addr,  // Address bus (20 bits)
