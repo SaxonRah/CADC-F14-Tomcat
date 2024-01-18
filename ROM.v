@@ -1,5 +1,6 @@
 module ROM (
-  input wire [3:0] address,
+  input wire clk,
+  input wire rst_n,
   output reg [19:0] data_out
 );
 
@@ -11,13 +12,19 @@ reg [19:0] memory [127:0] = {
   20'b11111111111111111111  // Pattern for word 127
 };
 
-always @(posedge clk or posedge rst_n) begin
+reg [6:0] counter = 0; // 7-bit counter for 128 words
+
+always @(posedge clk or negedge rst_n) begin
   if (~rst_n) begin
     // Reset logic if needed
+    counter <= 7'b0;
     data_out <= 20'b0;
   end else begin
-    // Read from memory based on the address
-    data_out <= memory[address];
+    // Increment counter on each clock cycle
+    counter <= counter + 1;
+
+    // Read from memory based on the counter
+    data_out <= memory[counter];
   end
 end
 
