@@ -7,10 +7,15 @@ module CATC_top (
     // Peripheral ports
     input  wire [19:0] gpio_in,
     output wire [19:0] gpio_out,
-    output wire [19:0] timer_val
+    // External memory bus (directly exposed for external RAM)
+    output wire [19:0] ext_addr,
+    output wire [19:0] ext_wdata,
+    output wire        ext_we,
+    output wire        ext_re,
+    input  wire [19:0] ext_rdata
 );
 
-    wire [6:0]  pc;
+    wire [11:0] pc;
     wire [19:0] instr;
 
     ROM rom_inst (
@@ -28,7 +33,11 @@ module CATC_top (
         .halt(halt),
         .gpio_in(gpio_in),
         .gpio_out(gpio_out),
-        .timer_val(timer_val)
+        .ext_addr(ext_addr),
+        .ext_wdata(ext_wdata),
+        .ext_we(ext_we),
+        .ext_re(ext_re),
+        .ext_rdata(ext_rdata)
     );
 
 endmodule
