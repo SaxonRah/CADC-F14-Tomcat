@@ -3,19 +3,21 @@ module CATC_top (
     input  wire        rst,
     input  wire [19:0] data_in,
     output wire [19:0] data_out,
-    output wire        halt
+    output wire        halt,
+    // Peripheral ports
+    input  wire [19:0] gpio_in,
+    output wire [19:0] gpio_out,
+    output wire [19:0] timer_val
 );
 
     wire [6:0]  pc;
     wire [19:0] instr;
 
-    // Instruction ROM (async read — combinational path from PC to instr)
     ROM rom_inst (
         .addr(pc),
         .data_out(instr)
     );
 
-    // Processor core
     CATC cpu_inst (
         .clk(clk),
         .rst(rst),
@@ -23,7 +25,10 @@ module CATC_top (
         .data_in(data_in),
         .data_out(data_out),
         .pc(pc),
-        .halt(halt)
+        .halt(halt),
+        .gpio_in(gpio_in),
+        .gpio_out(gpio_out),
+        .timer_val(timer_val)
     );
 
 endmodule
