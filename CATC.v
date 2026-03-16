@@ -1,54 +1,50 @@
 module CATC (
-    input wire clk,          // Clock signal
-    input wire rst,          // Reset signal
-    input wire [19:0] instr, // Instruction bus (20 bits)
-    input wire [19:0] data_in, // Input data bus (20 bits)
-    output reg [19:0] data_out // Output data bus (20 bits)
+    input  wire        clk,
+    input  wire        rst,
+    input  wire [19:0] instr,
+    input  wire [19:0] data_in,
+    output reg  [19:0] data_out
 );
 
-// Memory definition (2560 bits)
-reg [19:0] memory [0:127];
+    // Memory (128 x 20-bit)
+    reg [19:0] memory [0:127];
 
-// Register definition
-reg [19:0] registers [0:15];
+    // Registers (16 x 20-bit)
+    reg [19:0] registers [0:15];
 
-// Control signals
-reg [3:0] opcode;
-reg [3:0] src_reg;
-reg [3:0] dest_reg;
-reg [9:0] immediate;
+    // Combinational instruction decode
+    wire [3:0] opcode = instr[19:16];
+    wire [3:0] rA     = instr[15:12];
+    wire [3:0] rB     = instr[11:8];
+    wire [7:0] imm    = instr[7:0];
 
-always @(posedge clk or posedge rst) begin
-    if (rst) begin
-        // Reset values
-        opcode <= 4'b0000;
-        src_reg <= 4'b0000;
-        dest_reg <= 4'b0000;
-        immediate <= 10'b0000000000;
-        data_out <= 20'b0;
-        registers <= 16 * 20'b0;
-        memory <= 128 * 20'b0;
-    end else begin
-        // Instruction decoding
-        opcode <= instr[19:16];
-        src_reg <= instr[15:12];
-        dest_reg <= instr[11:8];
-        immediate <= instr[7:0];
+    integer i;
 
-        // Execute instruction based on opcode
-        case (opcode)
-            4'b0000: data_out <= registers[src_reg]; // LOAD
-            4'b0001: registers[dest_reg] <= data_in; // STORE
-            4'b0010: data_out <= data_in + immediate; // ADDI
-            4'b0011: data_out <= data_in - immediate; // SUBI
-            4'b0100: data_out <= registers[src_reg] & registers[dest_reg]; // AND
-            4'b0101: data_out <= registers[src_reg] | registers[dest_reg]; // OR
-            4'b0110: data_out <= registers[src_reg] ^ registers[dest_reg]; // XOR
-            4'b0111: data_out <= ~data_in; // NOT
-            // Add more operations
-            default: data_out <= 20'b0; // Default case
-        endcase
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            data_out <= 20'b0;
+            for (i = 0; i < 16; i = i + 1)
+                registers[i] <= 20'b0;
+            for (i = 0; i < 128; i = i + 1)
+                memory[i] <= 20'b0;
+        end else begin
+            case (opcode)
+                4'b0000: data_out <= memory[imm[6:0]];                   // LOAD  data_out = mem[imm]
+                4'b0001: memory[imm[6:0]] <= registers[rA];              // STORE mem[imm] = rA
+                4'b0010: registers[rA] <= registers[rB] + {12'b0, imm};  // ADDI  rA = rB + imm
+                4'b0011: registers[rA] <= registers[rB] - {12'b0, imm};  // SUBI  rA = rB - imm
+                4'b0100: registers[rA] <= registers[rA] & registers[rB]; // AND   rA = rA & rB
+                4'b0101: registers[rA] <= registers[rA] | registers[rB]; // OR    rA = rA | rB
+                4'b0110: registers[rA] <= registers[rA] ^ registers[rB]; // XOR   rA = rA ^ rB
+                4'b0111: registers[rA] <= ~registers[rA];                // NOT   rA = ~rA
+                4'b1000: registers[rA] <= registers[rA] << imm[4:0];     // SHL   rA = rA << imm
+                4'b1001: registers[rA] <= registers[rA] >> imm[4:0];     // SHR   rA = rA >> imm
+                4'b1010: registers[rA] <= {12'b0, imm};                  // MOVI  rA = imm
+                4'b1011: registers[rA] <= data_in;                       // IN    rA = data_in
+                4'b1100: data_out <= registers[rA];                      // OUT   data_out = rA
+                default: ; // NOP
+            endcase
+        end
     end
-end
 
 endmodule
