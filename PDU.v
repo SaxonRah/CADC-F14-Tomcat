@@ -1,34 +1,30 @@
 module PDU (
-  input wire [19:0] dividend,
-  input wire [19:0] divisor,
-  output reg [19:0] quotient,
-  output reg [19:0] remainder
+    input  wire [19:0] dividend,
+    input  wire [19:0] divisor,
+    output reg  [19:0] quotient,
+    output reg  [19:0] remainder
 );
 
-always @(dividend or divisor) begin
-  // Initialize vars
-  reg [19:0] temp_dividend;
-  reg [19:0] temp_quotient;
-  reg [4:0] count;
+    reg [20:0] partial;
+    reg [19:0] q_temp;
+    integer i;
 
-  // Reset vars
-  temp_dividend = dividend;
-  temp_quotient = 0;
-  count = 20'd0;
+    always @(*) begin
+        partial = 21'b0;
+        q_temp  = 20'b0;
 
-  // Division loop
-  while (count < 20'd20) begin
-    if (temp_dividend >= divisor) begin
-      temp_dividend = temp_dividend - divisor;
-      temp_quotient[count] = 1;
+        for (i = 19; i >= 0; i = i - 1) begin
+            // Shift in next dividend bit
+            partial = {partial[19:0], dividend[i]};
+
+            if (partial >= {1'b0, divisor}) begin
+                partial = partial - {1'b0, divisor};
+                q_temp[i] = 1'b1;
+            end
+        end
+
+        quotient  = q_temp;
+        remainder = partial[19:0];
     end
-    temp_dividend = temp_dividend << 1;
-    count = count + 1;
-  end
-
-  // Assign outputs
-  quotient = temp_quotient;
-  remainder = temp_dividend;
-end
 
 endmodule
