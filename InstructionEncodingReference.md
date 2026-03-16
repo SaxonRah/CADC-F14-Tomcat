@@ -67,70 +67,70 @@ Interrupt behavior:
         |  rA=10: RETI            | SP++, PC = mem[SP], IE = 1
 ```
 
-
 # program.mem — loaded by ROM via $readmemh
 ```
- === Vector table ===
- Addr | Hex   | Assembly                    | Effect
- -----|-------|-----------------------------|-----------------------------
-  0   | F0005 | JMP 5                       | reset → skip ISR, go to main
+=== Vector table ===
+Addr | Hex   | Assembly                    | Effect
+-----|-------|-----------------------------|-----------------------------
+ 0   | F0005 | JMP 5                       | reset → skip ISR, go to main
 
- === Timer ISR (vector at address 1) ===
-  1   | 4DD01 | ADDI R13, R13, 1            | R13++ (interrupt counter)
-  2   | 3C001 | MOVI R12, 1                 | R12 = 1
-  3   | 2C07D | STORE R12, [R0+125]         | clear IRQ_FLAGS bit 0
-  4   | FA000 | RETI                         | return from interrupt
+=== Timer ISR (vector at address 1) ===
+ 1   | 4DD01 | ADDI R13, R13, 1            | R13++ (interrupt counter)
+ 2   | 3C001 | MOVI R12, 1                 | R12 = 1
+ 3   | 2C07D | STORE R12, [R0+125]         | clear IRQ_FLAGS bit 0
+ 4   | FA000 | RETI                         | return from interrupt
 
- === Main program (address 5) ===
-  5   | 3100A | MOVI R1, 10                 | R1 = 10
-  6   | 32003 | MOVI R2, 3                  | R2 = 3
-  7   | 43105 | ADDI R3, R1, 5              | R3 = 15
-  8   | 54302 | SUBI R4, R3, 2              | R4 = 13
-  9   | C1200 | MUL  R1, R2                 | R1 = 30, HI = 0
- 10   | D3200 | DIV  R3, R2                 | R3 = 5,  HI = 0
- 11   | 05000 | MFHI R5                     | R5 = 0
+=== Main program (address 5) ===
+ 5   | 3100A | MOVI R1, 10                 | R1 = 10
+ 6   | 32003 | MOVI R2, 3                  | R2 = 3
+ 7   | 43105 | ADDI R3, R1, 5              | R3 = 15
+ 8   | 54302 | SUBI R4, R3, 2              | R4 = 13
+ 9   | C1200 | MUL  R1, R2                 | R1 = 30, HI = 0
+10   | D3200 | DIV  R3, R2                 | R3 = 5,  HI = 0
+11   | 05000 | MFHI R5                     | R5 = 0
 
- --- Stack and subroutine ---
- 12   | 01100 | PUSH R1                     | save R1 = 30
- 13   | 02100 | PUSH R2                     | save R2 = 3
- 14   | 31007 | MOVI R1, 7                  | R1 = 7
- 15   | F8037 | CALL 55                     | call subroutine (doubles R1)
- 16   | 02200 | POP  R2                     | restore R2 = 3
- 17   | 01200 | POP  R1                     | restore R1 = 30
+--- Stack and subroutine ---
+12   | 01100 | PUSH R1                     | save R1 = 30
+13   | 02100 | PUSH R2                     | save R2 = 3
+14   | 31007 | MOVI R1, 7                  | R1 = 7
+15   | F8037 | CALL 55                     | call subroutine (doubles R1)
+16   | 02200 | POP  R2                     | restore R2 = 3
+17   | 01200 | POP  R1                     | restore R1 = 30
 
- --- CMP + flag branch ---
- 18   | 01302 | CMP  R1, R2                 | 30-3=27 → Z=0, N=0
- 19   | F4016 | BGT  22                     | Z=0 && N=0 → taken
- 20   | 3A063 | MOVI R10, 99                | (skipped)
- 21   | F0017 | JMP  23                     | (skipped)
- 22   | 3A02A | MOVI R10, 42                | R10 = 42
+--- CMP + flag branch ---
+18   | 01302 | CMP  R1, R2                 | 30-3=27 → Z=0, N=0
+19   | F4016 | BGT  22                     | Z=0 && N=0 → taken
+20   | 3A063 | MOVI R10, 99                | (skipped)
+21   | F0017 | JMP  23                     | (skipped)
+22   | 3A02A | MOVI R10, 42                | R10 = 42
 
- --- External memory test ---
- 23   | 0E701 | LUI  R14, 1                 | R14 = 0x01000 (4096)
- 24   | 2AE00 | STORE R10, [R14+0]          | ext_mem[4096] = 42
- 25   | 1BE00 | LOAD  R11, [R14+0]          | R11 = ext_mem[4096] = 42
+--- External memory test ---
+23   | 0E701 | LUI  R14, 1                 | R14 = 0x01000 (4096)
+24   | 2AE00 | STORE R10, [R14+0]          | ext_mem[4096] = 42
+25   | 1BE00 | LOAD  R11, [R14+0]          | R11 = ext_mem[4096] = 42
 
- --- GPIO peripheral output ---
- 26   | 2A078 | STORE R10, [R0+120]         | gpio_out = 42
+--- GPIO peripheral output ---
+26   | 2A078 | STORE R10, [R0+120]         | gpio_out = 42
 
- --- Timer interrupt setup ---
- 27   | 38008 | MOVI R8, 8                  | timer compare = 8
- 28   | 2807C | STORE R8, [R0+124]          | TIMER_CMP = 8
- 29   | 38003 | MOVI R8, 3                  | enable=1, irq_en=1
- 30   | 2807B | STORE R8, [R0+123]          | TIMER_CTRL = 3 (start timer)
- 31   | 00500 | EI                           | enable global interrupts
+--- Timer interrupt setup ---
+27   | 38008 | MOVI R8, 8                  | timer compare = 8
+28   | 2807C | STORE R8, [R0+124]          | TIMER_CMP = 8
+29   | 38003 | MOVI R8, 3                  | enable=1, irq_en=1
+30   | 2807B | STORE R8, [R0+123]          | TIMER_CTRL = 3 (start timer)
+31   | 00500 | EI                           | enable global interrupts
 
- --- Wait loop (timer fires interrupts during these NOPs) ---
- 32-51: NOP x20
+--- Wait loop (timer fires interrupts during these NOPs) ---
+32-51: NOP x20
 
- --- Post-interrupt ---
- 52   | 00600 | DI                           | disable interrupts
- 53   | ED100 | OUT  R13                     | data_out = interrupt count
- 54   | F3000 | HALT                         | stop
+--- Post-interrupt ---
+52   | 00600 | DI                           | disable interrupts
+53   | ED100 | OUT  R13                     | data_out = interrupt count
+54   | F3000 | HALT                         | stop
 
- --- Subroutine at address 55: double R1 ---
- 55   | A1001 | SHL  R1, 1                  | R1 <<= 1
- 56   | F9000 | RET                          | return
+--- Subroutine at address 55: double R1 ---
+55   | A1001 | SHL  R1, 1                  | R1 <<= 1
+56   | F9000 | RET                          | return
+
 ```
 
 ```
