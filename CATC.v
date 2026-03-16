@@ -170,15 +170,15 @@ module CATC (
                     endcase
                 end
 
-                4'b0011: registers[rA] <= {12'b0, imm};                     // MOVI
-                4'b0100: registers[rA] <= registers[rB] + {12'b0, imm};     // ADDI
-                4'b0101: registers[rA] <= registers[rB] - {12'b0, imm};     // SUBI
-                4'b0110: registers[rA] <= registers[rA] & registers[rB];    // AND
-                4'b0111: registers[rA] <= registers[rA] | registers[rB];    // OR
-                4'b1000: registers[rA] <= registers[rA] ^ registers[rB];    // XOR
+                4'b0011: registers[rA] <= {12'b0, imm};                   // MOVI
+                4'b0100: registers[rA] <= registers[rB] + {12'b0, imm};   // ADDI
+                4'b0101: registers[rA] <= registers[rB] - {12'b0, imm};   // SUBI
+                4'b0110: registers[rA] <= registers[rA] & registers[rB];   // AND
+                4'b0111: registers[rA] <= registers[rA] | registers[rB];   // OR
+                4'b1000: registers[rA] <= registers[rA] ^ registers[rB];   // XOR
                 4'b1001: registers[rA] <= ~registers[rA];                   // NOT
-                4'b1010: registers[rA] <= registers[rA] << imm[4:0];        // SHL
-                4'b1011: registers[rA] <= registers[rA] >> imm[4:0];        // SHR
+                4'b1010: registers[rA] <= registers[rA] << imm[4:0];       // SHL
+                4'b1011: registers[rA] <= registers[rA] >> imm[4:0];       // SHR
 
                 4'b1100: begin // MUL — {HI, rA} = rA * rB
                     registers[rA] <= mul_result[19:0];
