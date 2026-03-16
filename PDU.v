@@ -11,7 +11,6 @@ module PDU (
 
     always @(*) begin
         if (divisor == 20'b0) begin
-            // Divide by zero: return max quotient, zero remainder
             quotient  = 20'hFFFFF;
             remainder = 20'b0;
         end else begin
